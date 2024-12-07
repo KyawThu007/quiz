@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Try Something</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <style type="text/css">
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: medium;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .form {
+            margin: auto;
+            width: 30%;
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 2%;
+        }
+
+        p,
+        input {
+            font-size: 20px;
+        }
+
+        img {
+            height: 60px;
+            margin: auto;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid vh-100 bg-dark d-flex justify-content-center align-items-center">
+        <div class="form shadow-sm bg-white rounded">
+            <form method="post" action="php_action/request.php">
+                <h2>Welcome to Quiz</h2>
+                <img src="image/user-large-solid.svg" />
+                <p style="width:70%;background-color:black;height:1px;margin:auto;margin-top:20px;margin-bottom:10px;">
+                </p>
+                <div style="padding:5% 10% 10% 10%">
+                    <p>Username</p>
+                    <input class="form-control" name="username" type="text" required />
+                    <p style="margin-top:10px;">Password</p>
+                    <input class="form-control" name="password" type="password" required />
+                    <p id="warning" style="text-align: center;font-size: 16px;padding-top: 10px;"></p>
+                    <button class="btn btn-primary" onclick="submit">Login</button>
+                </div>
+        </div>
+        </form>
+    </div>
+    <script>
+        window.onload = (event) =>{
+            var urlSParams = new URLSearchParams(window.location.search);
+        var result = urlSParams.get('result');
+            if(result && result!="Account is active"){
+                document.getElementById('warning').textContent = result;
+            }
+        }
+      
+    </script>
+</body>
+
+</html>
