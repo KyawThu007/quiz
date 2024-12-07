@@ -1,138 +1,126 @@
-<?php require_once('../../php_action/db_connect.php');?>
 <?php
-if($_POST){
-    $question=$_POST['question'];
-    $choice1=$_POST['choice1'];
-    $choice2=$_POST['choice2'];
-    $choice3=$_POST['choice3'];
-    $answer=$_POST['answer'];
-    $id=$_POST['id'];
-    $sql1="UPDATE quiz SET question='$question', choice1='$choice1', choice2='$choice2', choice3='$choice3', answer='$answer' WHERE id='{$id}'";
-    if($connect->query($sql1)===TRUE){
-        header("Location:../question/question.php");
-    }else {
-        echo "Error updating : " . $conect->error;
+require_once('../../php_action/db_connect.php');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Securely retrieve and parse POST data
+    $id = intval($_POST['id']);
+    $question = trim($_POST['question']);
+    $choice1 = trim($_POST['choice1']);
+    $choice2 = trim($_POST['choice2']);
+    $choice3 = trim($_POST['choice3']);
+    $answer = intval($_POST['answer']);
+
+    // Prepare and execute SQL update statement
+    $sql = "UPDATE quiz SET question = ?, choice1 = ?, choice2 = ?, choice3 = ?, answer = ? WHERE id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("ssssii", $question, $choice1, $choice2, $choice3, $answer, $id);
+
+    if ($stmt->execute()) {
+        header("Location: ../question/question.php");
+        exit;
+    } else {
+        echo "Error updating: " . $stmt->error;
     }
+
+    $stmt->close();
     $connect->close();
-}else{
-    $id=$_GET['id'];
-    $sql="SELECT * FROM quiz WHERE id='{$id}'";
-    $result=$connect->query($sql);
-    if($result->num_rows>0){
-       while($row=$result->fetch_assoc()){
-           $question=$row['question'];
-           $choice1=$row['choice1'];
-           $choice2=$row['choice2'];
-           $choice3=$row['choice3'];
-           $answer=$row['answer'];
-       }
+} else {
+    $id = intval($_GET['id']);
+
+    // Prepare and execute SQL select statement
+    $stmt = $connect->prepare("SELECT * FROM quiz WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        $question = htmlspecialchars($row['question']);
+        $choice1 = htmlspecialchars($row['choice1']);
+        $choice2 = htmlspecialchars($row['choice2']);
+        $choice3 = htmlspecialchars($row['choice3']);
+        $answer = htmlspecialchars($row['answer']);
+    } else {
+        echo "No record found.";
+        exit;
     }
+
+    $stmt->close();
     $connect->close();
 }
-echo <<<_END
+?>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Edit Question</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <style type="text/css">
-            body{font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-size: large;padding: 0;margin: 0;}
-            table{
-                width:100%;
-            }
-            table tr th{
-                padding:10px;
-                width: 60px;
-            }
-            .question{
-                width: 100%;
-                display: flex;
-            }
-            .question-div:nth-child(1){
-                width: 10%;
-                justify-content: right;
-                align-items: right;
-                text-align: right;
-            
-            }
-            .question-div:nth-child(2){
-                width: 80%;
-                margin-right: 10%;
-            }
-            .back{
-                margin: 1rem;
-                width: 100px;
-            }
-            .update{
-                margin-top: 1rem;
-            }
-            table tr:last-child td{
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            
-            }
-            table tr:first-child,table tr:nth-child(2){
-                display:none;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="question">
-            <a href="question.php" class="question-div">
-                <button type="button" class="btn btn-secondary back">Back</button>
-            </a>
-            <div class="question-div">
-                <fieldset class="border p-2">
-                    <legend class="float-none w-auto p-2">Edit Question</legend>
-                    <form action="edit.php" method="post">
-                    <table>
-                        <tr>
-                        <th>Id</th>
-                        </tr>
-                        <tr>
-                        <td><input type="text" readonly class="form-control" name="id" placeholder="ID" value='{$id}' required/></td>
-                        </tr>
-                        <tr>
-                            <th>Question</th>
-                        </tr>
-                        <tr>
-                            <td><textarea type="text" class="form-control" name="question" placeholder="Write here..." rows="3" required>$question</textarea></td>
-                        </tr>
-                        <tr>
-                            <th>Choice1</th>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="form-control" name="choice1" placeholder="Write here..." value='{$choice1}' required/></td>
-                        </tr>
-                        <tr>
-                            <th>Choice2</th>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="form-control" name="choice2" placeholder="Write here..." value='{$choice2}' required/></td>
-                        </tr>
-                        <tr>
-                            <th>Choice3</th>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="form-control" name="choice3" placeholder="Write here..." value='{$choice3}' required/></td>
-                        </tr>
-                        <tr>
-                            <th>Answer</th>
-                        </tr>
-                        <tr>
-                            <td><input type="number" class="form-control" name="answer" value='{$answer}' placeholder="1 or 2 or 3" required/></td>
-                        </tr>
-                        <tr>
-                            <td><button type="submit" class="btn btn-primary update">Update Changes</button></td>
-                        </tr>
-                    </table>
-                    </form>
+
+<head>
+    <title>Edit Question</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: medium;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .update-btn {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid bg-dark p-4" style="height:100%">
+        <div class="form-container bg-light p-3 rounded">
+            <a href="question.php" class="btn btn-secondary mb-3">Back</a>
+
+            <form action="edit.php" method="post">
+                <fieldset class="border p-3">
+                    <legend class="w-auto">Edit Question</legend>
+                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+
+                    <div class="form-group">
+                        <label>Question</label>
+                        <textarea class="form-control" name="question" rows="3"
+                            required><?php echo $question; ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Choice 1</label>
+                        <input type="text" class="form-control" name="choice1" value="<?php echo $choice1; ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Choice 2</label>
+                        <input type="text" class="form-control" name="choice2" value="<?php echo $choice2; ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Choice 3</label>
+                        <input type="text" class="form-control" name="choice3" value="<?php echo $choice3; ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Answer</label>
+                        <input list="answers" name="answer" class="form-control" value="<?php echo $answer; ?>"
+                            required>
+                        <datalist id="answers">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                        </datalist>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary update-btn">Update Changes</button>
                 </fieldset>
-            </div>
+            </form>
+
         </div>
-        
-    </body>
+    </div>
+
+</body>
+
 </html>
-_END
-?>

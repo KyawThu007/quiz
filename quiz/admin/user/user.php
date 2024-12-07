@@ -11,18 +11,11 @@
     <style type="text/css">
         body {
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-            font-size: large;
-            padding: 0;
-            margin: 0;
-        }
-
-        .manageMember {
-            margin: auto;
-            padding: 10px;
+            font-size: medium
         }
 
         table {
-            margin-top: 60px;
+            margin-top: 2.5rem;
             width: 100%;
         }
 
@@ -74,8 +67,8 @@
 </head>
 
 <body>
-    <div class="manageMember bg-dark vh-100">
-        <div class="header">
+    <div class="container-fluid bg-dark p-4" style="height:100vh">
+        <div class="header bg-dark px-4">
             <a href="../index.html" class="header-nav">
                 <button type="button" class="btn btn-secondary">Back</button>
             </a>
@@ -85,7 +78,7 @@
             </a>
         </div>
 
-        <table class="table table-info">
+        <table class="table table-info bg-light">
             <thead class="thead-light">
                 <tr>
                     <th>Username</th>
